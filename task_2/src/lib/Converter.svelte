@@ -1,5 +1,6 @@
 <script lang="ts">
-  import {exchangeRateApi} from "../api/exchangeRateApi";
+  import { exchangeRateApi } from "../api/exchangeRateApi";
+  import { onMount } from "svelte";
 
   const inputData = {
     firstField: "",
@@ -19,30 +20,34 @@
 
   let currenciesList = ["USD"]
 
-  exchangeRateApi.getCurrencyRate("USD")
-    .then((currenciesData) => {
-      currencies.firstCurrency.name = currenciesData["base_code"]
-      currencies.firstCurrency.rates = currenciesData["conversion_rates"]
+  onMount(() => {
+    exchangeRateApi.getCurrencyRate("USD")
+      .then((currenciesData) => {
+        currencies.firstCurrency.name = currenciesData["base_code"]
+        currencies.firstCurrency.rates = currenciesData["conversion_rates"]
 
-      currencies.secondCurrency.name = currenciesData["base_code"]
-      currencies.secondCurrency.rates = currenciesData["conversion_rates"]
+        currencies.secondCurrency.name = currenciesData["base_code"]
+        currencies.secondCurrency.rates = currenciesData["conversion_rates"]
 
-      currenciesList = Object.keys(currenciesData["conversion_rates"])
-    })
-    .catch((err) => {
-      throw Error(`Ошибка! ${err.code}`)
-    })
+        currenciesList = Object.keys(currenciesData["conversion_rates"])
+      })
+      .catch((err) => {
+        throw Error(`Ошибка! ${err.code}`)
+      })
+  })
+
+  function handleCalculations(currencyInputId) {
+    if(currencyInputId === "firstField") {
+      inputData["secondField"] = (Number(inputData["firstField"]) * Number(currencies["firstCurrency"].rates[currencies["secondCurrency"].name])).toString()
+    } else if(currencyInputId === "secondField") {
+      inputData["firstField"] = (Number(inputData["secondField"]) / Number(currencies["firstCurrency"].rates[currencies["secondCurrency"].name])).toString()
+    }
+  }
 
   function handleInputCurrency(evt: InputEvent) {
     inputData[evt.target.id] = evt.target.value
 
-    if(evt.target.id === "firstField") {
-      inputData["secondField"] = (Number(inputData["firstField"]) * Number(currencies["firstCurrency"].rates[currencies["secondCurrency"].name])).toString()
-    }
-
-    if(evt.target.id === "secondField") {
-      inputData["firstField"] = (Number(inputData["secondField"]) / Number(currencies["firstCurrency"].rates[currencies["secondCurrency"].name])).toString()
-    }
+    handleCalculations(evt.target.id)
   }
 
   function handleSelectCurrency(evt: InputEvent) {
@@ -54,8 +59,10 @@
           currencies[evt.target.id].rates = currencyData["conversion_rates"]
         })
         .then(() => {
-          console.log(currencies)
+          handleCalculations("firstField")
         })
+    } else {
+      handleCalculations("firstField")
     }
   }
 </script>
