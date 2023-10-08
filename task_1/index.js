@@ -3,7 +3,7 @@ import {encoded, translations} from './data.js'
 function decoded() {
   const translationsKeys = Object.keys(translations);
   const exceptions = ["groupId", "service", "formatSize", "ca"];
-  const ignoredId = [];
+  const nonUniqueId = [];
   const uniqueId = {};
 
   encoded.forEach(item => {
@@ -14,11 +14,11 @@ function decoded() {
       }
 
       if(translationsKeys.includes(item[key])) {
-        if(!uniqueId[item[key]] && !ignoredId.includes(item[key])) {
+        if(!uniqueId[item[key]] && !nonUniqueId.includes(item[key])) {
           uniqueId[item[key]] = 1;
         } else if(uniqueId[item[key]]) {
           delete uniqueId[item[key]]
-          ignoredId.push(item[key])
+          nonUniqueId.push(item[key])
         }
 
         item[key] = translations[item[key]]
