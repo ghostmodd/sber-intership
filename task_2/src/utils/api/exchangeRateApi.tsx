@@ -9,7 +9,7 @@ class ExchangeRateApi {
 
   _getError(res: Response) {
     if (!res.ok) {
-      return res
+      return res.status
     }
   }
 
@@ -31,4 +31,4 @@ class ExchangeRateApi {
   }
 }
 
-export const exchangeRateApi = new ExchangeRateApi("https://v6.exchangerate-api.com/v6","f48a1831213c6e1a60eb93df");
+export const exchangeRateApi = new ExchangeRateApi("https://v6.exchangerate-api.com/v6", "f48a1831213c6e1a60eb93df");
